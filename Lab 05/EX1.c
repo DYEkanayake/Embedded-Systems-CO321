@@ -1,0 +1,29 @@
+#include<avr/io.h>
+#include<util/delay.h>
+int main (){
+  //MAKE PORTC[1] AS INPUT 
+  //MAKE PORTD AS OUTPUT 
+  DDRC=DDRC & ~(1 << 1);
+  DDRD=DDRD | 0b1111111;
+  //ADEN=1;//ENABLE ADC
+  //ADPS2=1;//ADC PRESCALER (SPEED OF CONVERSION)=128
+  //ADPS1=1;
+  //ADPS0=1;
+  ADCSRA |=(1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+  
+  //REFS1=0;REFS0=1;//AVCC AS THE REFERENCE 
+  //MUX3=0;MUX2=0;MUX1=0;MUX0=1;//SET THE INPUT CHANNEL ADC1
+  //ADLAR=1;//LEFT SHIFTED
+  ADMUX = ADMUX |(1 << REFS0)|(1 << MUX0)|(1 << ADLAR);
+  ADMUX = ADMUX & ~(1 << REFS1) & ~(1 << MUX3) & ~(1 << MUX2) & ~(1 << MUX1) ;
+  ADCSRA = ADCSRA |(1 << ADSC);//START CONVERSION
+    
+  //UNTIL CONVERSION FINISHES
+    while(ADCSRA & (1 << ADSC )) ;
+  //ASSIGN THE VALUE OF ADCH CONVERTED INTO 8 BIT BINARY VALUE
+  
+  PORTD  = PORTD |int(((ADCH)*5/255));
+  
+  return 0;
+}
+
